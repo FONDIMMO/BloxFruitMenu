@@ -1,7 +1,8 @@
 --[[
-    TERMINATOR v7.0 // ULTIMATE OVERLORD EDITION
+    TERMINATOR v7.1 // ULTIMATE OVERLORD EDITION
     - FULL BLOX FRUITS AUTOMATION
     - DISCORD WEBHOOK: INTEGRATED
+    - NEW: SUPER AUTO-FARM (SAFE MODE)
     - GUI: PREMIUM NEON
     - CONTROLS: [L] TO HIDE
 ]]
@@ -14,6 +15,7 @@ pcall(function()
     local rs = game:GetService("ReplicatedStorage")
     local uis = game:GetService("UserInputService")
     local http = game:GetService("HttpService")
+    local vu = game:GetService("VirtualUser")
 
     -- ТВОЙ ВЕБХУК
     local WEBHOOK_URL = "https://discord.com/api/webhooks/1469664776639610880/ub2RL5ZybFoisLFAjtBWvtARaZO9m8ka2Gg7CqtNDG-aHQyt3jodDFwY2qn1F6cqXQDQ"
@@ -26,8 +28,8 @@ pcall(function()
 
     -- ГЛАВНОЕ ОКНО
     local main = Instance.new("Frame", sg)
-    main.Size = UDim2.new(0, 450, 0, 550)
-    main.Position = UDim2.new(0.5, -225, 0.5, -275)
+    main.Size = UDim2.new(0, 450, 0, 580) -- Чуть увеличил высоту под новую кнопку
+    main.Position = UDim2.new(0.5, -225, 0.5, -290)
     main.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
     main.BorderSizePixel = 0
     main.Active = true
@@ -58,7 +60,7 @@ pcall(function()
     scroll.Position = UDim2.new(0, 10, 0, 70)
     scroll.BackgroundTransparency = 1
     scroll.ScrollBarThickness = 2
-    scroll.CanvasSize = UDim2.new(0, 0, 1.5, 0)
+    scroll.CanvasSize = UDim2.new(0, 0, 1.8, 0) -- Увеличил прокрутку
     Instance.new("UIListLayout", scroll).Padding = UDim.new(0, 8)
 
     -- [ ФУНКЦИЯ DISCORD ]
@@ -111,6 +113,40 @@ pcall(function()
 
     -- [ ФУНКЦИОНАЛ ]
 
+    -- 1. СУПЕР АВТО-ФАРМ (НОВОЕ)
+    _G.AutoFarm = false
+    makeBtn("SUPER AUTO-FARM", "Убийство ближайших мобов (Safe Mode)", Color3.fromRGB(255, 50, 50), function()
+        _G.AutoFarm = not _G.AutoFarm
+        if _G.AutoFarm then
+            task.spawn(function()
+                while _G.AutoFarm do
+                    pcall(function()
+                        local target = nil
+                        local dist = 500
+                        -- Поиск врага
+                        for _, v in pairs(workspace.Enemies:GetChildren()) do
+                            if v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 and v:FindFirstChild("HumanoidRootPart") then
+                                local d = (lp.Character.HumanoidRootPart.Position - v.HumanoidRootPart.Position).Magnitude
+                                if d < dist then
+                                    dist = d
+                                    target = v
+                                end
+                            end
+                        end
+                        if target then
+                            -- Летим над головой
+                            lp.Character.HumanoidRootPart.CFrame = target.HumanoidRootPart.CFrame * CFrame.new(0, 7, 0)
+                            -- Авто-клик
+                            vu:CaptureController()
+                            vu:ClickButton1(Vector2.new(851, 158), workspace.CurrentCamera.CFrame)
+                        end
+                    end)
+                    task.wait(0.1)
+                end
+            end)
+        end
+    end)
+
     makeBtn("INFINITE ENERGY", "Твоя энергия всегда 100%", Color3.new(0, 1, 1), function()
         task.spawn(function()
             while true do
@@ -150,7 +186,6 @@ pcall(function()
                 lp.Character.Humanoid:EquipTool(v)
             end
         end
-        if not found then print("Фруктов нет.") end
     end)
 
     makeBtn("AUTO-CHEST FARM", "Сбор сундуков на острове", Color3.new(1, 1, 0), function()
@@ -177,7 +212,7 @@ pcall(function()
         end
     end)
 
-    -- АВТО-ДЕТЕКТОР ДЛЯ ДИСКОРДА
+    -- АВТО-ДЕТЕКТОР ФРУКТОВ ДЛЯ ДИСКОРДА (ФОНОВЫЙ)
     workspace.ChildAdded:Connect(function(child)
         task.wait(1)
         if child:IsA("Tool") and child.Name:find("Fruit") then
@@ -185,10 +220,10 @@ pcall(function()
         end
     end)
 
-    -- СКРЫТИЕ (L)
+    -- СКРЫТИЕ МЕНЮ НА КНОПКУ [L]
     uis.InputBegan:Connect(function(k, m)
         if not m and k.KeyCode == Enum.KeyCode.L then main.Visible = not main.Visible end
     end)
 
-    print("--- TERMINATOR v7.0 ULTIMATE LOADED ---")
+    print("--- TERMINATOR v7.1 ULTIMATE LOADED ---")
 end)
