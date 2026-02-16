@@ -48,7 +48,7 @@ pcall(function()
 
     local title = Instance.new("TextLabel", header)
     title.Size = UDim2.new(1, 0, 1, 0)
-    title.Text = "TERMINATOR v7.0 // OVERLORD"
+    title.Text = "TERMINATOR v7.1 // OVERLORD"
     title.TextColor3 = Color3.new(1, 1, 1)
     title.Font = Enum.Font.GothamBold
     title.TextSize = 20
